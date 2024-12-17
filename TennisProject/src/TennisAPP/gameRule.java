@@ -3,6 +3,7 @@ package TennisAPP;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Random;
+import java.util.Scanner;
 
 import com.github.lalyos.jfiglet.FigletFont;
 
@@ -56,152 +57,123 @@ public class gameRule extends newGame {
 	
 	
 	private static void pointCount(String player1, String player2) {
-		Random rnd = new Random();
-		int[] counts = { 0, 0 };
-		
-		while (loop) {
-			System.out.printf("\t🥎<%d세트> %d 게임 시작 🥎\n",mainSetCount,gameCount);	
-			System.out.printf("%s 점수 : %d\n", player1, counts[0]);
-			System.out.printf("%s 점수 : %d\n", player2, counts[1]);
-			break;
-		}
-		
-		while (loop) {
+	    Scanner scan = new Scanner(System.in);
+	    int[] scores = {0, 0}; // 각 선수의 점수 (0, 15, 30, 40)
+	    boolean loop = true;
 
-			System.out.println();
-			
-			counts[rnd.nextInt(2)] += 1;
-			if (!(counts[0] == 3 && counts[1] == 3)) {
-				if (counts[0] <= 2 && counts[1] <= 2) {
-					System.out.printf("%s 점수 : %d\n", player1, counts[0] * 15);
-					System.out.printf("%s 점수 : %d\n", player2, counts[1] * 15);
-				} else if (counts[0] == 3 && counts[1] <= 2) {
-					System.out.printf("%s 점수 : %d\n", player1, 40);
-					System.out.printf("%s 점수 : %d\n", player2, counts[1] * 15);
-				} else if (counts[1] == 3 && counts[0] <= 2) {
-					System.out.printf("%s 점수 : %d\n", player1, counts[0] * 15);
-					System.out.printf("%s 점수 : %d\n", player2, 40);
-				}
-				
+	    System.out.printf("\t🥎<%d세트> %d 게임 시작 🥎\n", mainSetCount, gameCount);
 
-				if ((counts[0] == 4 && counts[1] <= 2)) {
-					player1_gameCount++;
-					gameCount++;
-					System.out.println("-------------------------------------");
-					System.out.println("|\t\t\t\t    |");
+	    while (loop) {
+	        System.out.printf("\n%s 선수의 점수를 올리시겠습니까? (Y/N): ", player1);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            scores[0] = updateScore(scores[0]);
+	        }
 
-					System.out.printf("\t✅%s 선수 게임 획득 !\n", player1);
-					System.out.println();
-					System.out.println("\t  <현재 게임 스코어>");
-					System.out.printf("\t%s 선수: %d게임\n", player1, player1_gameCount);
-					System.out.printf("\t%s 선수: %d게임\n", player2, player2_gameCount);
-					System.out.println();
-					
-					System.out.println("|___________________________________|");
-					view.pause();
-					break;
-				} else if ((counts[0] <= 2 && counts[1] == 4)) {
-					player2_gameCount++;
-					gameCount++;
-					System.out.println("-------------------------------------");
-					System.out.println("|\t\t\t\t    |");
-					System.out.printf("\t✅%s 선수 게임 획득 !\n", player2);
-					
-					System.out.println();
-					System.out.println("\t  <현재 게임 스코어>");
-					System.out.printf("\t%s 선수: %d게임\n", player1, player1_gameCount);
-					System.out.printf("\t%s 선수: %d게임\n", player2, player2_gameCount);
-					System.out.println();
-					System.out.println("|___________________________________|");
-					view.pause();
-					break;
-				}
+	        System.out.printf("%s 선수의 점수를 올리시겠습니까? (Y/N): ", player2);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            scores[1] = updateScore(scores[1]);
+	        }
 
-			} else {
-				System.out.printf("%s 점수 : %d\n", player1, 40);
-				System.out.printf("%s 점수 : %d\n", player2, 40);
-				try {
-					  
-				    String asciiArt3 = FigletFont.convertOneLine(new File("./dat/dotmatrix.flf"), "Deuce !");     
-				    System.out.println(asciiArt3);
-					} catch (Exception e) {
-						System.out.println("Ex70.main");
-						e.printStackTrace();
-					}
+	        // 점수 출력
+	        System.out.printf("\n%s 점수: %s\n", player1, displayScore(scores[0]));
+	        System.out.printf("%s 점수: %s\n", player2, displayScore(scores[1]));
 
-				view.pause();
-				deuce(player1,player2);
-				break;
-			}
-		}
+	        // 게임 승리 조건 확인
+	        if (scores[0] == 4 && scores[1] < 3) { // 4는 40 이후 승리
+	            player1_gameCount++;
+	            gameCount++;
+	            System.out.printf("\n  ✅ %s 선수가 게임을 획득했습니다!\n", player1);
+	            break;
+	        } else if (scores[1] == 4 && scores[0] < 3) {
+	            player2_gameCount++;
+	            gameCount++;
+	            System.out.printf("\n  ✅ %s 선수가 게임을 획득했습니다!\n", player2);
+	            break;
+	        } else if (scores[0] == 3 && scores[1] == 3) { // 듀스 상황
+	            System.out.println("\n🎾 듀스 상황입니다! 🎾");
+	            view.pause();
+	            deuce(player1, player2);
+	            break;
+	        }
+	    }
+
+	    // 현재 게임 스코어 출력
+	    System.out.println();
+	    System.out.println("︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵︵");
+	    System.out.println("\t  <현재 게임 스코어>");
+	    System.out.printf("\t%s 선수: %d게임\n", player1, player1_gameCount);
+	    System.out.printf("\t%s 선수: %d게임\n", player2, player2_gameCount);
+	    System.out.println("︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶︶");
+	    view.pause();
 	}
-	
-	
-	
-	
-	
 
-	private static void deuce(String player1,String player2) {
-		Random rnd = new Random();
-	     int[] counts = { 0, 0 };
-		    
-	     	while (loop) {
-	         	
-	     		counts[rnd.nextInt(2)] += 1;
-	         	System.out.printf("%s 점수 : %d\n", player1, counts[0]);
-	 			System.out.printf("%s 점수 : %d\n", player2, counts[1]);
-
-	 			if (counts[0] - counts[1] == 1) {
-	 				System.out.println();
-	 				System.out.printf("%s선수 AD\n", player1);
-	 			}else if (counts[0] - counts[1] == 2) {
-	 					System.out.println();
-	 					System.out.println("-------------------------------------");
-						System.out.println("|\t\t\t\t    |");
-	 					System.out.printf("\t✅%s선수 게임 획득 !\n", player1);
-	 					player1_gameCount++;
-	 					gameCount++;
-	 					System.out.println("\t  <현재 게임 스코어>");
-	 					System.out.printf("\t%s선수: %d게임\n", player1, player1_gameCount);
-						System.out.printf("\t%s선수: %d게임\n", player2, player2_gameCount);
-	 					System.out.println();
-	 					System.out.println("|___________________________________|");
-
-
-						view.pause();
-	 					break;
-	 			} 
-	 			
-	 			else if (counts[1] - counts[0] == 1) {
-	 				System.out.println();
-	 				System.out.printf("%s선수 AD\n", player2);
-	 				System.out.println();
-	 				
-	 			} else if (counts[1] - counts[0] == 2) {
-	 					System.out.println();
-	 					System.out.println("-------------------------------------");
-						System.out.println("|\t\t\t\t    |");
-	 					System.out.printf("\t✅%s선수 게임 획득 !\n", player2);
-	 					player2_gameCount++;
-	 					gameCount++;
-	 					System.out.println();
-	 					System.out.println("\t  <현재 게임 스코어>");
-	 					System.out.printf("\t%s 선수: %d게임\n", player1, player1_gameCount);
-						System.out.printf("\t%s 선수: %d게임\n", player2, player2_gameCount);
-	 					System.out.println();
-	 					System.out.println("|___________________________________|");
-
-
-						view.pause();
-	 				
-						break;
-	 				
-	 			} else {
-	 				System.out.println("\t👉 듀스"); 
-	 			}
-	     	}
-
+	// 점수 업데이트 메서드
+	private static int updateScore(int currentScore) {
+	    switch (currentScore) {
+	        case 0: return 1; // 0 -> 15
+	        case 1: return 2; // 15 -> 30
+	        case 2: return 3; // 30 -> 40
+	        default: return 4; // 40 -> 승리
+	    }
 	}
+
+	// 점수를 표시하는 메서드
+	private static String displayScore(int score) {
+	    switch (score) {
+	        case 0: return "0";
+	        case 1: return "15";
+	        case 2: return "30";
+	        case 3: return "40";
+	        default: return "Game Point!";
+	    }
+	}
+
+	
+	private static void deuce(String player1, String player2) {
+	    Scanner scan = new Scanner(System.in);
+	    int[] scores = {0, 0}; // 듀스 상태 점수 초기화
+	    boolean loop = true;
+
+	    System.out.println("\n🎾 듀스 상황입니다! 승리하려면 2점 차를 내야 합니다. 🎾");
+
+	    while (loop) {
+	        System.out.printf("\n%s 선수의 점수를 올리시겠습니까? (Y/N): ", player1);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            scores[0]++;
+	        }
+
+	        System.out.printf("%s 선수의 점수를 올리시겠습니까? (Y/N): ", player2);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            scores[1]++;
+	        }
+
+	        // 점수 표시
+	        System.out.printf("\n%s 점수: %d\n", player1, scores[0]);
+	        System.out.printf("%s 점수: %d\n", player2, scores[1]);
+
+	        // 승리 조건: 2점 차이 발생 시 승리
+	        if (scores[0] - scores[1] >= 2) {
+	            player1_gameCount++;
+	            gameCount++;
+	            System.out.printf("\n✅ %s 선수가 게임을 획득했습니다!\n", player1);
+	            break;
+	        } else if (scores[1] - scores[0] >= 2) {
+	            player2_gameCount++;
+	            gameCount++;
+	            System.out.printf("\n✅ %s 선수가 게임을 획득했습니다!\n", player2);
+	            break;
+	        } else if (scores[0] > scores[1]) {
+	            System.out.printf("\n%s 선수 AD (Advantage)\n", player1);
+	        } else if (scores[1] > scores[0]) {
+	            System.out.printf("\n%s 선수 AD (Advantage)\n", player2);
+	        } else {
+	            System.out.println("\n🎾 다시 듀스! 🎾");
+	        }
+	    }
+
+	    view.pause();
+	}
+
 
 	private static void gameCount(String player1, String player2) {
 		
@@ -211,8 +183,6 @@ public class gameRule extends newGame {
 			|| (player1_gameCount == 6 && player2_gameCount == 5)
 			|| (player1_gameCount == 5 && player2_gameCount == 6)){
 				
-				
-				System.out.println("듀스");
 				gameDeuce(player1, player2);
 				
 			} else if (player1_gameCount == 6 && player2_gameCount == 6) {
@@ -224,9 +194,9 @@ public class gameRule extends newGame {
 				setCount++;
 				mainSetCount++;
 				player1_setCount++;
-				System.out.println("-------------------------------------");
-				System.out.println("|\t\t\t\t    |");
-				System.out.printf("\n\t✅%s 선수 세트 획득\n", player1);
+				System.out.println("╔\t\t\t\t    ╗");
+				System.out.printf("\t✅%s 선수 세트 획득 !!\n", player1);
+				System.out.println("╚\t\t\t\t    ╝");
 				System.out.println();
 				break;
 			} else if (player2_gameCount == 7 && player1_gameCount == 5) {
@@ -234,11 +204,11 @@ public class gameRule extends newGame {
 				setCount++;
 				mainSetCount++;
 				player2_setCount++;
-				System.out.println("-------------------------------------");
-				System.out.println("|\t\t\t\t    |");
-					System.out.printf("\n\t✅%s 선수 세트 획득 !!\n", player2);
-					System.out.println();
-					break;
+				System.out.println("╔\t\t\t\t    ╗");
+				System.out.printf("\t✅%s 선수 세트 획득 !!\n", player2);
+				System.out.println("╚\t\t\t\t    ╝");
+				System.out.println();
+				break;
 			} else if((player1_gameCount >= 6 || player2_gameCount >= 6)
 					&& !(player1_gameCount == 6 && player2_gameCount == 5)
 					&& !(player1_gameCount == 5 && player2_gameCount == 6)
@@ -251,10 +221,9 @@ public class gameRule extends newGame {
 					setCount++;
 					mainSetCount++;
 					player1_setCount++;
-					System.out.println("-------------------------------------");
-					System.out.println("|\t\t\t\t    |");
-
-					System.out.printf("\n\t✅%s 선수 세트 획득 !!\n", player1);
+					System.out.println("╔\t\t\t\t    ╗");
+					System.out.printf("\t✅%s 선수 세트 획득 !!\n", player1);
+					System.out.println("╚\t\t\t\t    ╝");
 					System.out.println();
 					break;
 				} else if (player2_gameCount >= 6) {
@@ -262,10 +231,9 @@ public class gameRule extends newGame {
 					setCount++;
 					mainSetCount++;
 					player2_setCount++;
-					System.out.println("-------------------------------------");
-					System.out.println("|\t\t\t\t    |");
-
-					System.out.printf("\n\t✅%s 선수 세트 획득 !!\n", player2);
+					System.out.println("╔\t\t\t\t    ╗");
+					System.out.printf("\t✅%s 선수 세트 획득 !!\n", player2);
+					System.out.println("╚\t\t\t\t    ╝");
 					System.out.println();
 					break;
 				} 
@@ -289,77 +257,63 @@ public class gameRule extends newGame {
 		
 	}
 			
-		private static void tiebreak(String player1, String player2) {
-			Random rnd = new Random();
-			System.out.println();
-			try {
-				  
-			    String asciiArt3 = FigletFont.convertOneLine(new File("./dat/slant.flf"), "TieBreak !");     
-			    System.out.println(asciiArt3);
-				} catch (Exception e) {
-					System.out.println("Ex70.main");
-					e.printStackTrace();
-				}
-			System.out.println("게임이 6대6 동점이므로 타이브레이크를 진행합니다. \n");
-			System.out.println();
-			int[] lastGamePoint = { 6, 6 }; // 직전 경기 점수
 
+	
+	private static void tiebreak(String player1, String player2) {
+	    Scanner scan = new Scanner(System.in);
+	    int player1Point = 0;
+	    int player2Point = 0;
 
-			if (lastGamePoint[0] == lastGamePoint[1]) {
+	    System.out.println();
+	    try {
+	        String asciiArt3 = FigletFont.convertOneLine(new File("./dat/slant.flf"), "TieBreak !");
+	        System.out.println(asciiArt3);
+	    } catch (Exception e) {
+	        System.out.println("타이브레이크 시작 오류 발생");
+	        e.printStackTrace();
+	    }
 
-				while (loop) {
-					
-					System.out.printf("%s 점수 : %d\n", player1, player1Point);
-					System.out.printf("%s 점수 : %d\n", player2, player2Point);
-					System.out.println();
-					
-					int winner = rnd.nextInt(2) + 1;
+	    System.out.println("게임이 6대6 동점이므로 타이브레이크를 진행합니다.\n");
 
-					if (winner == 1) {
-						player1Point++;
-					} else {
-						player2Point++;
-					}
-					
-					if (player1Point >= 7 && player1Point >= player2Point + 2) {
-						System.out.printf("%s 점수 : %d\n", player1, player1Point);
-						System.out.printf("%s 점수 : %d\n", player2, player2Point);
-						System.out.println("-------------------------------------");
-						System.out.println("|\t\t\t\t    |");
+	    while (true) {
+	        // 플레이어 점수 입력
+	        System.out.printf("%s 선수의 점수를 올리시겠습니까? (Y/N): ", player1);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            player1Point++;
+	        }
 
-						System.out.printf("\n\t✅%s선수 게임 획득 !\n",player1);
-						recordscore(player1,player2);
-						player1_setCount++;
-						setCount++;
-						mainSetCount++;
-						System.out.println();
-						
-						break;
-					} else if (player2Point >= 7 && player2Point >= player1Point + 2) {
-						System.out.printf("%s 점수 : %d\n", player1, player1Point);
-						System.out.printf("%s 점수 : %d\n", player2, player2Point);
-						System.out.println("-------------------------------------");
-						System.out.println("|\t\t\t\t    |");
+	        System.out.printf("%s 선수의 점수를 올리시겠습니까? (Y/N): ", player2);
+	        if (scan.nextLine().equalsIgnoreCase("Y")) {
+	            player2Point++;
+	        }
 
-						System.out.printf("\n%s\t✅선수 게임 획득 !\n",player2);
-						recordscore(player1,player2);
-						player2_setCount++;
-						setCount++;
-						mainSetCount++;
-						System.out.println();
-						
+	        // 점수 출력
+	        System.out.printf("\n%s 점수: %d\n", player1, player1Point);
+	        System.out.printf("%s 점수: %d\n", player2, player2Point);
 
-						break;
-					}
-				}
-				player1Point=0;
-				player2Point=0;
+	        // 승리 조건: 7점 이상 + 2점 차이
+	        if (player1Point >= 7 && player1Point >= player2Point + 2) {
+	            System.out.printf("\n✅ %s 선수가 타이브레이크 게임을 획득했습니다!\n", player1);
+	            recordscore(player1, player2);
+	            player1_setCount++;
+	            setCount++;
+	            mainSetCount++;
+	            break;
+	        } else if (player2Point >= 7 && player2Point >= player1Point + 2) {
+	            System.out.printf("\n✅ %s 선수가 타이브레이크 게임을 획득했습니다!\n", player2);
+	            recordscore(player1, player2);
+	            player2_setCount++;
+	            setCount++;
+	            mainSetCount++;
+	            break;
+	        }
+	    }
 
-			} else {
-				System.out.println("타이브레이크를 진행하지 않습니다. 경기를 종료합니다. ");
-			}
-
-		}
+	    // 점수 초기화
+	    player1Point = 0;
+	    player2Point = 0;
+	    view.pause();
+	}
 
 	
 	
@@ -370,11 +324,12 @@ public class gameRule extends newGame {
 		
 		
 		while(loop) {
-			System.out.println("\t <현재 세트 스코어>");
+			System.out.println("╻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╻");
+			System.out.println("\n\t <현재 세트 스코어>");
 			System.out.printf("\t[%s] : %d\n", player1, player1_setCount);
 			System.out.printf("\t[%s] : %d\n", player2, player2_setCount);
 			System.out.println();
-			System.out.println("|___________________________________|");
+			System.out.println("╹━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╹");
 			
 			if(player1_setCount < 3 && player2_setCount < 3) {
 				manGame(player1, player2);
@@ -427,11 +382,12 @@ public class gameRule extends newGame {
 		
 		
 		while(loop) {
-			System.out.println("\t <현재 세트 스코어>");
+			System.out.println("╻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╻");
+			System.out.println("\n\t <현재 세트 스코어>");
 			System.out.printf("\t[%s] : %d\n", player1, player1_setCount);
 			System.out.printf("\t[%s] : %d\n", player2, player2_setCount);
 			System.out.println();
-			System.out.println("|___________________________________|");
+			System.out.println("╹━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╹");
 			
 			if(player1_setCount < 2 && player2_setCount < 2) {
 				womanGame(player1, player2);
@@ -457,26 +413,21 @@ public class gameRule extends newGame {
 		}
 	}
 	
-	private static void recordscore(String player1, String player2) {
-		
-		while(loop) {
-		
-		if(player1_gameCount>player2_gameCount) {
-			score[setCount] = player1_gameCount+","+player2_gameCount+","+ player1 +",";
-		}else if(player2_gameCount>player1_gameCount) {
-			score[setCount] = player1_gameCount+","+player2_gameCount+","+player2+",";			
-		}
-		else if(player1Point>player2Point) {
-			score[setCount] = player1Point+"/T"+","+player2Point+"/T"+","+player1+",";
-		}
-		else if(player2Point>player1Point) {
-			score[setCount] = player1Point+"/T"+","+player2Point+"/T"+","+player2+",";
-		}
-		break;
-		}
-		
-	}
 
+	
+	private static void recordscore(String player1, String player2) {
+	    while (loop) {
+	        if (player1Point > 0 || player2Point > 0) { // 타이브레이크 점수 확인
+	            score[setCount] = player1Point + "/T," + player2Point + "/T," + 
+	                              (player1Point > player2Point ? player1 : player2) + ",";
+	        } else if (player1_gameCount > player2_gameCount) { // 일반 게임 점수 기록
+	            score[setCount] = player1_gameCount + "," + player2_gameCount + "," + player1 + ",";
+	        } else if (player2_gameCount > player1_gameCount) {
+	            score[setCount] = player1_gameCount + "," + player2_gameCount + "," + player2 + ",";
+	        }
+	        break;
+	    }
+	}
 
 
 	private static void manFinalScore(String player1, String player2) {
