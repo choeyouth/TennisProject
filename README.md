@@ -47,3 +47,7 @@ Java, 파일 입출력 (I/O), 객체 지향 프로그래밍 (OOP), Scanner, Cale
 4. 세트 및 게임 단위 경기 결과 제공으로 사용자 편의성 증대
 5. 직접 입력 기반 계수기 리팩토링으로 사용자 선택의 유연성 강화
 </aside>
+
+
+**상세 정보 링크**
+https://choeyouth.notion.site/055fca5ffc5c44949be2097a46c4a8d7?pvs=4
