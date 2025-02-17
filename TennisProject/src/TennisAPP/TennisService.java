@@ -142,7 +142,7 @@ public class TennisService {
 			}
 		}
 
-		scan.skip("\r\n");
+		scan.skip("\n");
 		dao.addPlayer(dto);
 
 		System.out.println("선수 등록 완료 !");
